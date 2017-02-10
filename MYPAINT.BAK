@@ -1,0 +1,148 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <dos.h>
+#include <math.h>
+#include <time.h>
+#include "asm.h"
+#include "mouse.h"
+#include "graphics.h"
+
+#define v800x600x256             0x103
+#define sgn(x) ((x<0)?-1:((x>0)?1:0))
+
+int drawGUI = 1;
+void myLine(int x1, int y1, int x2, int y2, char color, int tkn){
+    int i, dx, dy, sdx, sdy, dxabs, dyabs, x, y, px, py;
+    dx=x2-x1;
+    dy=y2-y1;
+
+    dxabs = abs(dx);
+    dyabs = abs(dy);
+
+    sdx = sgn(dx);
+    sdy = sgn(dy);
+
+    x = dyabs>>1;
+    y = dxabs>>1;   
+
+    px=x1;
+    py=y1;
+
+    if(dxabs>=dyabs){
+        for(i=0;i<dxabs;i++){
+            y+=dyabs;
+            if(y>=dxabs){
+                y-=dxabs;
+                py+=sdy;
+            }
+            px+=sdx;
+                if(drawGUI || px>150 && px<800 && py>0 && py<600)
+                    putGrossPixel(px,py,color, tkn);
+        }
+    }else{
+        for(i=0;i<dyabs;i++){
+            x+=dxabs;
+            if (x>=dyabs){
+                x-=dyabs;
+                px+=sdx;
+            }
+            py+=sdy;
+            if(drawGUI || px>150 && px<800 && py>0 && py<600)
+                putGrossPixel(px,py,color, tkn);
+        }
+    }
+
+}
+
+void main ()
+{
+    int x, y, b, tempx, tempy;
+    int i, j;
+    int x1, y1;
+
+    if( !setVideoSVGA(v800x600x256, 800, 600)){
+      printf("\r\nError inicializacion de SVGA.\r\n");
+      return;
+    }
+ 
+    
+    
+    //Activa el mouse
+    setMouse();
+    setBoundariesMouse(800, 600);
+    getMouse(&x, &y, &b);
+    
+
+    for(i=0;i<800;i++){
+        for(j=0;j<600;j++){
+            putPixel(i, j, 15);
+        }
+    }
+
+    for(i=0;i<800;i++){
+    	for(j=0;j<75;j++){
+    	    putPixel(i, j, 50);
+    	}
+    }
+
+    for(i=790;i<800;i++){
+    	for(j=0;j<10;j++){
+    	    putPixel(i, j, 12);
+    	}
+    }
+
+    do {
+        refreshMouse(&x, &y, &b, &tempx, &tempy);
+                    
+        if((x < 0 && x < 800) && (y > 75 && y < 600) && b==1){
+            x1 = x;
+            y1 = y;
+            getMouse(&x,&y,&b);
+            while(b==1){
+                refreshMouse(&x, &y, &b, &tempx, &tempy);
+            }
+            hideMouse(x, y);
+            myLine(x1,y1,x,y, 0, 1);
+            showMouse(x, y);
+        }
+
+    } while (!((x > 790 && x < 800) && (y > 0 && y < 10) && b == 1));
+
+    unSetVideoSVGA();
+}
+
+/*void main()
+{
+   int i,j;
+   char ch;
+   unsigned char color;
+   clrscr();
+   printf("Bienvenido al Paint, press a key to start\n");
+   getch();
+
+   if (! setVideoMode(v640x480x256)){
+      unsetVideoMode();
+      return;
+   }
+
+
+   for(j=220;j<240;j++)
+      for(i=340;i<360;i++)
+         putPixel(i,j,50);
+
+   color = getColor(325,245);
+
+   for(j=25;j<50;j++)
+      for(i=25;i<50;i++)
+         putPixel(i,j,color);
+
+
+   for(j=50;j<150;j++)
+      for(i=50;i<150;i++)
+        putPixel(i,j,150);
+
+    do{
+      ch = getch();
+    }while(ch != '\x1b');
+    unsetVideoMode();   
+}*/
