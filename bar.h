@@ -23,8 +23,9 @@ void toolBar(){
 */
     //closeButton();
     //canvas();
+    //showPalette();
+    
     loadImage(0, 0, "MyPaint/fondo.bmp",&bmp);
-    showPalette();
 }
 void showPalette(){
     int i, j, k, l, color;

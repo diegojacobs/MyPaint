@@ -8,49 +8,43 @@ void drawFilledRectangle(int x1, int y1, int x2, int y2, char color,int tkn);
 
 
 void drawLine(int x1, int y1, int x2, int y2, char color, int tkn){
-    int i, dx, dy, sdx, sdy, dxabs, dyabs, x, y, px, py;
-    dx=x2-x1;
-    dy=y2-y1;
+int i, dx, dy, sdx, sdy, dxabs, dyabs, x, y, px, py;
+	dx=x2-x1;
+	dy=y2-y1;
 
-    if(dx < 0)
-    	dx = dx * -1;
+	dxabs = abs(dx);
+	dyabs = abs(dy);
 
-    if(dy < 0)
-    	dy = dy * -1;
+	sdx = sgn(dx);
+	sdy = sgn(dy);
 
-    sdx = sgn(dx);
-    sdy = sgn(dy);
+	x = dyabs>>1;
+	y = dxabs>>1;	
 
-    x = dy >> 1;
-    y = dx >> 1;
+	px=x1;
+	py=y1;
 
-    px=x1;
-    py=y1;
-
-    if(dx >= dy){
-		for(i=0; i<dx; i++){
-		    y += dy;
-		    if(y >= dx){
-				y -= dx;
-				py += sdy;
-		    }
-		    px += sdx;
-			
-			putGrossPixel(px, py, color, tkn);
-        }
-    }else{
-        for(i=0; i<dy; i++){
-            x += dx;
-            if (x >= dy){
-                x -= dy;
-                px += sdx;
-            }
-            py += sdy;
-            
-            putGrossPixel(px, py, color, tkn);
-        }
-    }
-
+	if(dxabs>=dyabs){
+		for(i=0;i<dxabs;i++){
+			y+=dyabs;
+			if(y>=dxabs){
+				y-=dxabs;
+				py+=sdy;
+			}
+			px+=sdx;
+			putGrossPixel(px,py,color, tkn);
+		}
+	}else{
+		for(i=0;i<dyabs;i++){
+			x+=dxabs;
+			if (x>=dyabs){
+				x-=dyabs;
+				px+=sdx;
+			}
+			py+=sdy;
+			putGrossPixel(px,py,color, tkn);
+		}
+	}
 }
 
 void drawRectangle(int x1, int y1, int x2, int y2, char color,int tkn){
