@@ -12,20 +12,8 @@ char getSelectedColor(int x, int y);
 void canvas();
 
 void toolBar(){
-    int i, j;
     BITMAP bmp;
-/*
-    for(i=0;i<800;i++){
-        for(j=0;j<75;j++){
-            putPixel(i, j, 50);
-        }
-    }
-*/
-    //closeButton();
-    //canvas();
-    //showPalette();
-    
-    loadImage(0, 0, "MyPaint/fondo.bmp",&bmp);
+    loadImage(0, 0, "MyPaint/toolbar.bmp",&bmp);
 }
 void showPalette(){
     int i, j, k, l, color;
@@ -46,13 +34,8 @@ void showPalette(){
 }
 
 void canvas(){
-    int i, j;
-
-    for(i=0;i<800;i++){
-        for(j=75;j<600;j++){
-            putPixel(i, j, 15);
-        }
-    }
+    BITMAP bmp;
+    loadImage(0, 100, "MyPaint/canvas.bmp",&bmp);
 }
 
 char getSelectedColor(int x, int y){

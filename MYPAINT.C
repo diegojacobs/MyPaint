@@ -51,6 +51,7 @@ void main ()
     setBoundariesMouse(790, 590);
     getMouse(&x, &y, &b);
 
+    canvas();
     toolBar();
 
     do {
@@ -58,6 +59,7 @@ void main ()
         
         //Click New
         if((x > 10 && x < 34) && (y > 8 && y < 41) && b==1){
+            canvas();
             toolBar();
         }
 
@@ -163,12 +165,12 @@ void main ()
 
         //Click Pattern 1
         if((x > 701 && x < 745) && (y > 52 && y < 96) && b==1){
-            selectedAction = PASTE;
+            selectedAction = PATTERN1;
         }
 
         //Click Pattern 2
         if((x > 753 && x < 797) && (y > 52 && y < 96) && b==1){
-            selectedAction = UNDO;
+            selectedAction = PATTERN2;
         }
 
         //Click en Palette

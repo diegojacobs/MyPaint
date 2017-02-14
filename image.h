@@ -1,10 +1,3 @@
-/*
-Universidad del Valle de Guatemala
-Autor: Henzer Garcia 12538
-Proyecto 1: PAINT
-Archivo: BMP.h
-*/
-
 #ifndef __DOS_H
   #include <dos.h>
 #endif                          /* si no est  incluida dos.h, incluirla */
