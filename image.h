@@ -1,6 +1,6 @@
 #ifndef __DOS_H
   #include <dos.h>
-#endif                          /* si no est  incluida dos.h, incluirla */
+#endif                          /* si no esta  incluida dos.h, incluirla */
         
 /* Estructuras */
 typedef unsigned char  byte;
@@ -208,7 +208,7 @@ void saveImage(int x, int y, int width, int height, char file[]){
   fwrite(xInf, sizeof(xInf[0]),2,fp);
   x--; y--;
   //Escribe el resto del header.
-  toWrite[0] = width * height + 1024 + 54;  //Tamalo
+  toWrite[0] = width * height + 1024 + 54;  //Tamaño
   toWrite[1] = 0;             // Reservado
   toWrite[2] = 1024 + 54;         // offset
   toWrite[3] = 40;            // Tamaño del header

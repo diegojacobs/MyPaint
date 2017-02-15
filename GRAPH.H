@@ -4,7 +4,8 @@
 
 void drawLine(int x1, int y1, int x2, int y2, char color, int tkn);
 void drawRectangle(int x1, int y1, int x2, int y2, char color,int tkn);
-void drawFilledRectangle(int x1, int y1, int x2, int y2, char color,int tkn);
+void drawFilledRectangle(int x1, int y1, int x2, int y2, char color1, char color2, int tkn);
+void spray(int x, int y, char color);
 
 
 void drawLine(int x1, int y1, int x2, int y2, char color, int tkn){
@@ -59,7 +60,7 @@ void drawRectangle(int x1, int y1, int x2, int y2, char color,int tkn){
 	drawLine(x1, y2, x2, y2, color, tkn);
 }
 
-void drawFilledRectangle(int x1, int y1, int x2, int y2, char color,int tkn){
+void drawFilledRectangle(int x1, int y1, int x2, int y2, char color1, char color2, int tkn){
 	int y, temp;
 
 	//Arregla los valores de y1 y y2 para que sean congruentes.
@@ -71,9 +72,22 @@ void drawFilledRectangle(int x1, int y1, int x2, int y2, char color,int tkn){
 
 	//Se dibuja el relleno del rectangulo.
 	for(y = y1; y <= y2; y++){
-		drawLine(x1, y, x2, y, color,1);
+		drawLine(x1, y, x2, y, color2 ,1);
 	}
 
 	//Se dibuja el contorno.
-	drawRectangle(x1, y1, x2, y2, color, tkn);
+	drawRectangle(x1, y1, x2, y2, color1, tkn);
+}
+
+void spray(int x, int y, char color){
+  int i, randx, randy;
+  time_t t;
+  randx = 0;  
+  randy = 0;      
+  for(i = 0; i < 5000; i++){
+    srand((unsigned) time(&t)+randx);
+    randx = rand() % 20;
+    randy = rand() % 20;
+    putPixel(x-randx, y-randy, color);
+  }
 }
