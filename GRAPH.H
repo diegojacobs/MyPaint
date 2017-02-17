@@ -6,7 +6,15 @@ void drawLine(int x1, int y1, int x2, int y2, char color, int tkn);
 void drawRectangle(int x1, int y1, int x2, int y2, char color,int tkn);
 void drawFilledRectangle(int x1, int y1, int x2, int y2, char color1, char color2, int tkn);
 void spray(int x, int y, char color);
+void bucketFill(int x, int y, char fillColor, int pattern);
 
+typedef struct linkedList{
+  int x;
+  int y;
+  struct Node* next;
+}Node;
+
+int * colores;
 
 void drawLine(int x1, int y1, int x2, int y2, char color, int tkn){
 int i, dx, dy, sdx, sdy, x, y, px, py;
@@ -90,4 +98,112 @@ void spray(int x, int y, char color){
     randy = rand() % 20;
     putPixel(x-randx, y-randy, color);
   }
+}
+
+void push(int x, int y, Node ** finish){
+	Node *node;
+	node = (Node*) malloc(sizeof(Node));
+	node->x=x;
+	node->y=y;
+	node->next=NULL;
+	(*finish)->next=node;
+	*finish = (*finish)->next;
+}
+
+void bucketFill(int x, int y, char fillColor, int pattern){
+	Node *start, *finish, *tmp;
+	char oldColor;
+	int tempx, tempy;
+	colores = (int*) malloc(sizeof(int)*4);
+	colores[0] = 0;
+	colores[1] = 20;
+	colores[2] = 100;
+	colores[3] = 120;
+	oldColor = getPixel(x, y);
+
+	if(fillColor == oldColor){
+    	return;
+  	}
+
+	//Node de inicio y final de la lista.
+	start = (Node*) malloc(sizeof(Node));
+	start->x=x;
+	start->y=y;
+	start->next=NULL;
+	finish = start;
+
+	while(start!=NULL){
+
+		if(pattern==1){
+			fillColor = getPixel(100 + x%32, 550 + y%32);
+		}else if(pattern == 2){
+			fillColor = getPixel(100 + x%32, 510 + y%32);
+		}else if(pattern==3){
+			fillColor = colores[x%4];
+		}
+
+		putPixel(x,y,fillColor);
+		//Izquierda
+		tempx = x-1;
+		if(getPixel(tempx,y) == oldColor && ((tempx)>100 && (tempx)<800 && y>100 && y<600)) {
+			if(pattern==1){
+				fillColor = getPixel(100 + tempx%32, 550 + y%32);
+			}else if(pattern == 2){
+				fillColor = getPixel(100 + tempx%32, 510 + y%32);
+			}else if(pattern==3){
+				fillColor = colores[tempx%4];
+			}
+			putPixel(tempx,y,fillColor);
+			push(tempx, y, &finish);
+		}
+		//Arriba
+		tempy = y+1;
+		if(getPixel(x,tempy) == oldColor && (x>100 && x<800 && (tempy)>100 && (tempy)<600)){
+			if(pattern==1){
+				fillColor = getPixel(100 + x%32, 550 + tempy%32);
+			}else if(pattern == 2){
+				fillColor = getPixel(100 + x%32, 510 + tempy%32);
+			}else if(pattern==3){
+				fillColor = colores[x%4];
+			}
+
+			putPixel(x,tempy,fillColor);
+			push(x, tempy, &finish);
+		}
+		//Derecha
+		tempx = x+1;
+		if(getPixel(tempx,y) == oldColor && ((tempx)>100 && (tempx)<800 && y>100 && y<600)){
+			if(pattern==1){
+				fillColor = getPixel(100 + tempx%32, 550 + y%32);
+			}else if(pattern == 2){
+				fillColor = getPixel(100 + tempx%32, 510 + y%32);
+			}else if(pattern==3){
+				fillColor = colores[tempx%4];
+			}
+
+			putPixel(tempx,y,fillColor);
+			push(tempx,y, &finish);
+		}
+		//Abajo
+		tempy = y-1;
+		if(getPixel(x,tempy) == oldColor && (x>100 && x<800 && (tempy)>100 && (tempy)<600)){
+			if(pattern==1){
+				fillColor = getPixel(100 + x%32, 550 + tempy%32);
+			}else if(pattern == 2){
+				fillColor = getPixel(100 + x%32, 510 + tempy%32);
+			}else if(pattern==3){
+				fillColor = colores[x%4];
+			}
+
+			putPixel(x,tempy,fillColor);
+			push(x,tempy, &finish);
+		}
+		//Se mueve al siguiente elemento de la lista.
+		tmp=start;
+		start=start->next;
+		x=start->x;
+		y=start->y;
+		free(tmp);
+	}
+	free(start);
 }

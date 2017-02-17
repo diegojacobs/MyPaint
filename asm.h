@@ -1,6 +1,3 @@
-long resY, resX, limitX, limitY, numberOfBanks;
-char currentBank;
-
 #define v800x600x256     0x103
 #define v1024x768x256    0x105
 #define v1280x1024x256   0x107
@@ -14,6 +11,8 @@ char getPixel(int x, int y);
 
 char currentBank;
 long resolutionWidth, resolutionHeight, nBanks;
+long resY, resX, limitX, limitY, numberOfBanks;
+char currentBank;
 
 int setVideoMode(int mode, long width, long height)
 {

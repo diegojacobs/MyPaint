@@ -8,6 +8,7 @@
 #include "image.h"
 #include "graph.h"
 #include "bar.h"
+#include "undo.h"
 
 
 #define v800x600x256             0x103
@@ -33,15 +34,16 @@
 #define PATTERN1                20
 #define PATTERN2                21
 #define SPRAY                   22
+
 void main ()
 {
     int selectedAction = PENCIL;
     int x, y, b, tempx, tempy;
     int i, j;
     int x1, y1;
-    char selectedColor1 = getPixel(6, 182);
-    char selectedColor2 = getPixel(48, 182);
-    int grossor = 1;
+    int radiox, radioy;
+    char selectedColor1, selectedColor2;
+    int thickness = 1;
 
     if( !setVideoMode(v800x600x256, 800, 600)){
       printf("\r\nError inicializacion de SVGA.\r\n");
@@ -56,6 +58,8 @@ void main ()
     canvas();
     toolBar();
 
+    selectedColor1 = getPixel(25, 200);
+    selectedColor2 = getPixel(75, 200);
     do {
         refreshMouse(&x, &y, &b, &tempx, &tempy);
         
@@ -77,17 +81,17 @@ void main ()
 
         //Click Grossor 1
         if((x > 123 && x < 165) && (y > 24 && y < 33) && b==1){
-            grossor = 1;
+            thickness = 1;
         }
 
         //Click Grossor 2
         if((x > 123 && x < 165) && (y > 38 && y < 49) && b==1){
-            grossor = 2;
+            thickness = 2;
         }
 
         //Click Grossor 3
         if((x > 123 && x < 165) && (y > 54 && y < 65) && b==1){
-            grossor = 3;
+            thickness = 3;
         }
 
         //Click Pencil
@@ -163,23 +167,26 @@ void main ()
         }
 
         //Click Copy
-        if((x > 336 && x < 368) && (y > 11 && y < 43) && b==1){
+        if((x > 575 && x < 611) && (y > 8 && y < 43) && b==1){
             selectedAction = COPY;
         }
 
         //Click Cut
-        if((x > 338 && x < 366) && (y > 55 && y < 87) && b==1){
+        if((x > 578 && x < 608) && (y > 54 && y < 89) && b==1){
             selectedAction = CUT;
         }
 
         //Click Paste
-        if((x > 377 && x < 403) && (y > 12 && y < 44) && b==1){
+        if((x > 616 && x < 647) && (y > 9 && y < 46) && b==1){
             selectedAction = PASTE;
         }
 
         //Click Undo
-        if((x > 338 && x < 406) && (y > 55 && y < 87) && b==1){
+        if((x > 613 && x < 651) && (y > 55 && y < 86) && b==1){
             selectedAction = UNDO;
+            hideMouse(x, y);
+            undo();
+            showMouse(x, y);
         }
 
         //Click Pattern 1
@@ -274,7 +281,7 @@ void main ()
                 selectedColor2 = getPixel(23, y);  
 
             //Fill color 2 rectangle
-            drawFilledRectangle(5, 181, 44, 220, selectedColor2, selectedColor2, 1);
+            drawFilledRectangle(57, 181, 96, 220, selectedColor2, selectedColor2, 1);
         }
 
         if((x > 57 && x < 75) && b==2){
@@ -305,58 +312,61 @@ void main ()
             drawFilledRectangle(57, 181, 96, 220, selectedColor2, selectedColor2, 1);
         }
 
-        //Click en canvas
+        //Right click in canvas
     	if((x > 100 && x < 800) && (y > 100 && y < 600) && b==1){
             switch(selectedAction){
                 case PENCIL:
                     hideMouse(x, y);
                     tempx = x;
                     tempy = y;
+                    saveUndo();
                     while(b==1 && (x > 100 && x < 800) && (y > 100 && y < 600)){
-                        drawLine(x, y, tempx, tempy, selectedColor1, grossor);
-                        tempx=x; tempy = y;
-                        getMouse(&x,&y,&b);
+                        drawLine(x, y, tempx, tempy, selectedColor1, thickness);
+                        tempx = x; 
+                        tempy = y;
+                        getMouse(&x, &y, &b);
                     }
                     showMouse(x, y);
-                    tempx=x; 
-                    tempy=y;
+                    tempx = x; 
+                    tempy = y;
                 break;
 
                 case LINE:
                     x1 = x;
                     y1 = y;
-                    getMouse(&x,&y,&b);
-                    while(b==1){
+                    getMouse(&x, &y, &b);
+                    while(b == 1){
                         refreshMouse(&x, &y, &b, &tempx, &tempy);
                     }
                     hideMouse(x, y);
+                    saveUndo();
                     if((x > 100 && x < 800) && (y > 100 && y < 600))
-                        drawLine(x1, y1, x, y, selectedColor1, grossor);
+                        drawLine(x1, y1, x, y, selectedColor1, thickness);
                     showMouse(x, y);
                 break;
 
                 case RECTANGLE:
-                    x1=x;
-                    y1=y;
+                    x1 = x;
+                    y1 = y;
+                    while(b == 1){
+                        refreshMouse(&x, &y, &b, &tempx, &tempy);
+                    }
+                    hideMouse(x, y);
+                    if((x > 100 && x < 800) && (y > 100 && y < 600))
+                        drawRectangle(x1, y1 ,x, y, selectedColor1, thickness);
+                    showMouse(x, y);
+                break;
+
+                case FILLEDRECTANGLE:
+                    x1 = x;
+                    y1 = y;
                     while(b==1){
                         refreshMouse(&x, &y, &b, &tempx, &tempy);
                     }
                     hideMouse(x, y);
                     if((x > 100 && x < 800) && (y > 100 && y < 600))
-                        drawRectangle(x1, y1 ,x, y, selectedColor1, grossor);
+                        drawFilledRectangle(x1, y1 ,x, y, selectedColor1, selectedColor2, thickness);
                     showMouse(x, y);
-                break;
-
-                case FILLEDRECTANGLE:
-                    x1=x;
-                        y1=y;
-                        while(b==1){
-                            refreshMouse(&x, &y, &b, &tempx, &tempy);
-                        }
-                        hideMouse(x, y);
-                        if((x > 100 && x < 800) && (y > 100 && y < 600))
-                            drawFilledRectangle(x1, y1 ,x, y, selectedColor1, selectedColor2, 1);
-                        showMouse(x, y);
                 break;
 
                 case ERASER:
@@ -364,17 +374,31 @@ void main ()
                     tempx = x;
                     tempy = y;
                     while(b==1 && (x > 100 && x < 800) && (y > 100 && y < 600)){
-                        drawLine(x, y, tempx, tempy, selectedColor2, grossor);
-                        tempx=x; tempy = y;
+                        drawLine(x, y, tempx, tempy, selectedColor2, thickness);
+                        tempx = x; 
+                        tempy = y;
                         getMouse(&x,&y,&b);
                     }
                     showMouse(x, y);
-                    tempx=x; 
-                    tempy=y;
+                    tempx = x; 
+                    tempy = y;
+                break;
+
+                case BUCKET:
+                    hideMouse(x, y);
+                    bucketFill(x, y, selectedColor1, 0);
+                    showMouse(x, y);
                 break;
 
                 case SPRAY:
                     spray(x, y, selectedColor1);
+                break;
+
+                case EYEDROPPER:
+                    if(b==1 && (x > 100 && x < 800) && (y > 100 && y < 600)){
+                        selectedColor1 = getPixel(x - 1, y - 1);
+                        drawFilledRectangle(5, 181, 44, 220, selectedColor1, selectedColor1, 1);
+                    }
                 break;
             }
             
