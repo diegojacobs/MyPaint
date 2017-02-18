@@ -1,5 +1,3 @@
-
-
 #define I   15  //Color de la forma del cursor.
 #define X   17  //Color interno del cursor.
 

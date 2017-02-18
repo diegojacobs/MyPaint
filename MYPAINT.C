@@ -38,12 +38,14 @@
 void main ()
 {
     int selectedAction = PENCIL;
-    int x, y, b, tempx, tempy;
+    int x, y, b, tempx, tempy, cont;
     int i, j;
     int x1, y1;
     int radiox, radioy;
     char selectedColor1, selectedColor2;
     int thickness = 1;
+    Node *start;
+    int a[20][2];
 
     if( !setVideoMode(v800x600x256, 800, 600)){
       printf("\r\nError inicializacion de SVGA.\r\n");
@@ -352,6 +354,7 @@ void main ()
                         refreshMouse(&x, &y, &b, &tempx, &tempy);
                     }
                     hideMouse(x, y);
+                    saveUndo();
                     if((x > 100 && x < 800) && (y > 100 && y < 600))
                         drawRectangle(x1, y1 ,x, y, selectedColor1, thickness);
                     showMouse(x, y);
@@ -364,6 +367,7 @@ void main ()
                         refreshMouse(&x, &y, &b, &tempx, &tempy);
                     }
                     hideMouse(x, y);
+                    saveUndo();
                     if((x > 100 && x < 800) && (y > 100 && y < 600))
                         drawFilledRectangle(x1, y1 ,x, y, selectedColor1, selectedColor2, thickness);
                     showMouse(x, y);
@@ -373,6 +377,7 @@ void main ()
                     hideMouse(x, y);
                     tempx = x;
                     tempy = y;
+                    saveUndo();
                     while(b==1 && (x > 100 && x < 800) && (y > 100 && y < 600)){
                         drawLine(x, y, tempx, tempy, selectedColor2, thickness);
                         tempx = x; 
@@ -386,11 +391,13 @@ void main ()
 
                 case BUCKET:
                     hideMouse(x, y);
+                    saveUndo();
                     bucketFill(x, y, selectedColor1, 0);
                     showMouse(x, y);
                 break;
 
                 case SPRAY:
+                    saveUndo();
                     spray(x, y, selectedColor1);
                 break;
 
@@ -399,6 +406,84 @@ void main ()
                         selectedColor1 = getPixel(x - 1, y - 1);
                         drawFilledRectangle(5, 181, 44, 220, selectedColor1, selectedColor1, 1);
                     }
+                break;
+
+                case POLYGON:
+                    x1 = x; 
+                    y1 = y;
+                    i = x; 
+                    j = y;
+
+                    hideMouse(x, y);
+                    saveUndo();
+                    showMouse(x, y);
+
+                    cont = 0;
+                    while(b!=2){
+                        refreshMouse(&x, &y, &b, &tempx, &tempy);
+                        while(b!=1 && b!=2){
+                            refreshMouse(&x, &y, &b, &tempx, &tempy);
+                        }
+                        if(b==1){
+                            hideMouse(x, y);
+                            drawLine(x1, y1, x, y, selectedColor1, thickness);
+                            showMouse(x, y);
+                            cont++;
+                        }else{
+                            hideMouse(x, y);
+                            drawLine(i, j, x1, y1, selectedColor1, thickness);
+                            showMouse(x, y);
+                            cont++;
+                        }
+                        x1 = x;
+                        y1 = y;
+                        
+                    }
+                break;
+
+                case FILLEDPOLYGON:
+                    for (i = 0; i < 20; ++i)
+                    {
+                        for (j = 0; j < 2; ++j)
+                        {
+                            a[i][j] = 0;
+                        }
+                    }
+                    x1 = x; 
+                    y1 = y;
+                    i = x; 
+                    j = y;
+
+                    hideMouse(x, y);
+                    saveUndo();
+                    showMouse(x, y);
+
+                    cont = 0;
+                    while(b!=2){
+                        refreshMouse(&x, &y, &b, &tempx, &tempy);
+                        while(b!=1 && b!=2){
+                            refreshMouse(&x, &y, &b, &tempx, &tempy);
+                        }
+                        if(b==1){
+                            hideMouse(x, y);
+                            a[cont][0] = x; 
+                            a[cont][1] = y;
+                            drawLine(x1, y1, x, y, selectedColor1, thickness);
+                            showMouse(x, y);
+                            cont++;
+                        }else{
+                            hideMouse(x, y);
+                            a[cont][0] = i; 
+                            a[cont][1] = j;
+                            drawLine(i, j, x1, y1, selectedColor1, thickness);
+                            showMouse(x, y);
+                            cont++;
+                        }
+                        x1 = x;
+                        y1 = y;
+                    }
+                    undo();
+                    //scanline(a, cont, selectedColor1, thickness);
                 break;
             }
             
