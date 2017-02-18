@@ -41,6 +41,7 @@ void main ()
     int x, y, b, tempx, tempy, cont;
     int i, j;
     int x1, y1;
+    int* xval, yval;
     int radiox, radioy;
     char selectedColor1, selectedColor2;
     int thickness = 1;
@@ -442,13 +443,6 @@ void main ()
                 break;
 
                 case FILLEDPOLYGON:
-                    for (i = 0; i < 20; ++i)
-                    {
-                        for (j = 0; j < 2; ++j)
-                        {
-                            a[i][j] = 0;
-                        }
-                    }
                     x1 = x; 
                     y1 = y;
                     i = x; 
@@ -458,7 +452,10 @@ void main ()
                     saveUndo();
                     showMouse(x, y);
 
-                    cont = 0;
+                    a[0][0] = i; 
+                    a[0][1] = j;
+
+                    cont = 1;
                     while(b!=2){
                         refreshMouse(&x, &y, &b, &tempx, &tempy);
                         while(b!=1 && b!=2){
@@ -468,6 +465,7 @@ void main ()
                             hideMouse(x, y);
                             a[cont][0] = x; 
                             a[cont][1] = y;
+                            delay(300);
                             drawLine(x1, y1, x, y, selectedColor1, thickness);
                             showMouse(x, y);
                             cont++;
@@ -475,15 +473,16 @@ void main ()
                             hideMouse(x, y);
                             a[cont][0] = i; 
                             a[cont][1] = j;
+                            delay(300);
                             drawLine(i, j, x1, y1, selectedColor1, thickness);
                             showMouse(x, y);
                             cont++;
                         }
                         x1 = x;
                         y1 = y;
+                        
                     }
-                    undo();
-                    //scanline(a, cont, selectedColor1, thickness);
+                    scanline(a, cont, selectedColor1, thickness);
                 break;
             }
             
