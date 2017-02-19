@@ -1,9 +1,3 @@
-/*
-Universidad del Valle de Guatemala
-Autor: Henzer Garcia 12538
-Proyecto 1: PAINT
-Archivo: clip.h
-*/
 /* Estructuras */
 typedef struct ClipLine{
     int x0;
