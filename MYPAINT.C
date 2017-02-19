@@ -6,10 +6,14 @@
 #include "asm.h"
 #include "mouse.h"
 #include "image.h"
+#include "clip.h"
+#include "undo.h"
+#include "text.h"
 #include "graph.h"
 #include "bar.h"
-#include "undo.h"
 
+#define MIN(a,b) (((a) < (b)) ? (a) : (b))
+#define MAX(a,b) (((a) > (b)) ? (a) : (b))
 
 #define v800x600x256             0x103
 #define NEW                      1
@@ -42,16 +46,30 @@ void main ()
     int i, j;
     int x1, y1;
     int* xval, yval;
-    int radiox, radioy;
+    int rx, ry, xc, yc;
     char selectedColor1, selectedColor2;
     int thickness = 1;
     Node *start;
     int a[20][2];
+    
+    FILE *fontFile;
+    unsigned char font[58][16*16];
+    unsigned char backspace[16][16];
 
-    if( !setVideoMode(v800x600x256, 800, 600)){
-      printf("\r\nError inicializacion de SVGA.\r\n");
+    if(!setVideoMode(v800x600x256, 800, 600)){
+      printf("\r\nError couldn't initialize SVGA.\r\n");
       return;
     }
+
+    if((fontFile = fopen ("MyPaint/Font/font.fnt","rb"))==NULL){
+        printf("\r\nError.-Font not found.\r\n");
+        return;
+    }
+    for(x=0; x<58; x++){
+        fread(&font[x], 1, 16*16, fontFile);
+    }
+    fclose(fontFile);
+    setDimensions(16,16);
 
     //Activa el mouse
     setMouse();
@@ -63,9 +81,10 @@ void main ()
 
     selectedColor1 = getPixel(25, 200);
     selectedColor2 = getPixel(75, 200);
+    b = 0;
     do {
         refreshMouse(&x, &y, &b, &tempx, &tempy);
-        
+
         //Click New
         if((x > 10 && x < 34) && (y > 8 && y < 41) && b==1){
             canvas();
@@ -426,15 +445,21 @@ void main ()
                             refreshMouse(&x, &y, &b, &tempx, &tempy);
                         }
                         if(b==1){
-                            hideMouse(x, y);
-                            drawLine(x1, y1, x, y, selectedColor1, thickness);
-                            showMouse(x, y);
-                            cont++;
+                            if(b==1 && (x > 100 && x < 800) && (y > 100 && y < 600)){
+                                hideMouse(x, y);
+                                delay(300);
+                                drawLine(x1, y1, x, y, selectedColor1, thickness);
+                                showMouse(x, y);
+                                cont++;
+                            }
                         }else{
-                            hideMouse(x, y);
-                            drawLine(i, j, x1, y1, selectedColor1, thickness);
-                            showMouse(x, y);
-                            cont++;
+                            if(b==2 && (x > 100 && x < 800) && (y > 100 && y < 600)){
+                                hideMouse(x, y);
+                                delay(300);
+                                drawLine(i, j, x1, y1, selectedColor1, thickness);
+                                showMouse(x, y);
+                                cont++;
+                            }
                         }
                         x1 = x;
                         y1 = y;
@@ -462,27 +487,71 @@ void main ()
                             refreshMouse(&x, &y, &b, &tempx, &tempy);
                         }
                         if(b==1){
-                            hideMouse(x, y);
-                            a[cont][0] = x; 
-                            a[cont][1] = y;
-                            delay(300);
-                            drawLine(x1, y1, x, y, selectedColor1, thickness);
-                            showMouse(x, y);
-                            cont++;
+                            if(b==1 && (x > 100 && x < 800) && (y > 100 && y < 600)){
+                                hideMouse(x, y);
+                                a[cont][0] = x; 
+                                a[cont][1] = y;
+                                delay(300);
+                                drawLine(x1, y1, x, y, selectedColor1, thickness);
+                                showMouse(x, y);
+                                cont++;
+                            }
                         }else{
-                            hideMouse(x, y);
-                            a[cont][0] = i; 
-                            a[cont][1] = j;
-                            delay(300);
-                            drawLine(i, j, x1, y1, selectedColor1, thickness);
-                            showMouse(x, y);
-                            cont++;
+                            if(b==2 && (x > 100 && x < 800) && (y > 100 && y < 600)){
+                                hideMouse(x, y);
+                                a[cont][0] = i; 
+                                a[cont][1] = j;
+                                delay(300);
+                                drawLine(i, j, x1, y1, selectedColor1, thickness);
+                                showMouse(x, y);
+                                cont++;
+                            }
                         }
                         x1 = x;
                         y1 = y;
                         
                     }
-                    scanline(a, cont, selectedColor1, thickness);
+                    scanline(a, cont, selectedColor1, selectedColor2, thickness);
+                break;
+
+                case TEXT:
+                    hideMouse(x,y);
+                    saveUndo();
+                    printText(x, y, selectedColor1, font);
+                    showMouse(x, y);
+                    tempx=x; tempy=y;
+                break;
+
+                case CIRCLE:
+                    x1 = x;
+                    y1 = y;
+                    while(b == 1){
+                        refreshMouse(&x, &y, &b, &tempx, &tempy);
+                    }
+                    hideMouse(x, y);
+                    saveUndo();
+                    rx = abs(x - x1) / 2;
+                    ry = abs(y - y1) / 2;
+                    if((x > 100 && x < 800) && (y > 100 && y < 600))
+                        ellipse(x1, y1 ,x, y, selectedColor1, thickness);
+                    showMouse(x, y);
+                break;
+
+                case FILLEDCIRCLE:
+                    x1 = x;
+                    y1 = y;
+                    while(b==1){
+                        refreshMouse(&x, &y, &b, &tempx, &tempy);
+                    }
+                    hideMouse(x, y);
+                    saveUndo();
+                    rx = abs(x - x1) / 2;
+                    ry = abs(y - y1) / 2;
+                    xc = MIN(x1, x) + rx;
+                    yc = MIN(y1, y) + ry;
+                    if((x > 100 && x < 800) && (y > 100 && y < 600))
+                        filledElipse(xc, yc, rx, ry, selectedColor1, selectedColor2, thickness);
+                    showMouse(x, y);
                 break;
             }
             

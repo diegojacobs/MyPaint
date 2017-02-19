@@ -13,7 +13,7 @@ void canvas();
 
 void toolBar(){
     BITMAP bmp;
-    loadImage(0, 0, "MyPaint/toolbar.bmp", &bmp);
+    loadImage(0, 0, "MyPaint/Images/toolbar.bmp", &bmp);
 }
 void showPalette(){
     int i, j, k, l, color;
@@ -35,7 +35,7 @@ void showPalette(){
 
 void canvas(){
     BITMAP bmp;
-    loadImage(0, 100, "MyPaint/canvas.bmp", &bmp);
+    loadImage(0, 100, "MyPaint/Images/canvas.bmp", &bmp);
 }
 
 char getSelectedColor(int x, int y){
