@@ -116,7 +116,7 @@ int tcline(int x0, int y0, int x1, int y1, char drawcolor, int thickness){
   err = dx-dy;
   do{
     tempLine[i++] = getPixel(x0,y0);
-    putGrossPixel(x0,y0, drawcolor,thickness);
+    putThicknessPixel(x0,y0, drawcolor,thickness, 0);
     d = 2*err;
     if (d > -dy){               //Línea más horizontal.
       err -= dy;                //Balancea el cambio.
@@ -128,7 +128,7 @@ int tcline(int x0, int y0, int x1, int y1, char drawcolor, int thickness){
     }
   }while ((x0 != x1) || (y0 != y1));
   tempLine[i++] = getPixel(x0,y0);
-  putGrossPixel(x0,y0, drawcolor,thickness);
+  putThicknessPixel(x0,y0, drawcolor,thickness, 0);
   return 0;
 }
 
@@ -157,7 +157,7 @@ int rcline(int x0, int y0, int x1, int y1, int thickness){
   //Cambio que define si la recta es más horizontal o vertical.
   err = dx-dy;
   do{
-    putGrossPixel(x0,y0, tempLine[i++],thickness);
+    putThicknessPixel(x0,y0, tempLine[i++],thickness, 0);
     d = 2*err;
     if (d > -dy){               //Línea más horizontal.
       err -= dy;                //Balancea el cambio.
@@ -168,7 +168,7 @@ int rcline(int x0, int y0, int x1, int y1, int thickness){
       y0 += sgny;               //Aumenta en y.
     }
   }while ((x0 != x1) || (y0 != y1));
-  putGrossPixel(x0,y0, tempLine[i++],thickness);
+  putThicknessPixel(x0,y0, tempLine[i++],thickness, 0);
   free(tempLine);
   tempLine = 0;
   return 0;

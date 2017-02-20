@@ -23,6 +23,8 @@ void main ()
     int x1, y1;
     int rx, ry, xc, yc;
     char selectedColor1, selectedColor2;
+    int color1 = COLOR;
+    int color2 = COLOR;
     int thickness = 1;
     int a[20][2];
     BITMAP bmp;
@@ -76,14 +78,14 @@ void main ()
         //Click Save
         if((x > 10 && x < 42) && (y > 56 && y < 88) && b==1){
             hideMouse(x, y);
-            saveImage(100, 100, 800, 600, "MyPaint/Images/Paint.bmp");
+            saveImage(100, 100, 800, 600, "MyPaint/Buffer/Paint.bmp");
             showMouse(x, y);
         }
 
         //Click Open
         if((x > 42 && x < 75) && (y > 12 && y < 88) && b==1){
             hideMouse(x, y);
-            loadImage(100, 100, "MyPaint/Images/Paint.bmp", &bmp);
+            loadImage(100, 100, "MyPaint/Buffer/Paint.bmp", &bmp);
             topToolBar();
             showSelectedThickness(thickness, 0);
             showSelectedAction(selectedAction, 0);
@@ -249,31 +251,51 @@ void main ()
             showMouse(x, y);
         }
 
-        //Click Pattern 1
-        if((x > 701 && x < 745) && (y > 52 && y < 96) && b==1){
+        //Left Click Pattern 1
+        if((x > 5 && x < 44) && (y > 128 && y < 167) && b==1){
             hideMouse(x, y);
-            selectedAction = PATTERN1;
+            color1 = PATTERN1;
+            drawFilledRectangle(5, 181, 44, 220, selectedColor1, selectedColor1, SMALL, PATTERN1, PATTERN1);
             showMouse(x, y);
         }
 
-        //Click Pattern 2
-        if((x > 753 && x < 797) && (y > 52 && y < 96) && b==1){
+        //Left Click Pattern 2
+        if((x > 57 && x < 96) && (y > 128 && y < 167) && b==1){
             hideMouse(x, y);
-            selectedAction = PATTERN2;
+            color1 = PATTERN2;
+            drawFilledRectangle(5, 181, 44, 220, selectedColor1, selectedColor1, SMALL, PATTERN2, PATTERN2);
+            showMouse(x, y);
+        }
+
+        //Right Click Pattern 1
+        if((x > 5 && x < 44) && (y > 128 && y < 167) && b==2){
+            hideMouse(x, y);
+            color2 = PATTERN1;
+            drawFilledRectangle(57, 181, 96, 220, selectedColor2, selectedColor2, SMALL, PATTERN1, PATTERN1);
+            showMouse(x, y);
+        }
+
+        //Right Click Pattern 2
+        if((x > 57 && x < 96) && (y > 128 && y < 167) && b==2){
+            hideMouse(x, y);
+            color2 = PATTERN2;
+            drawFilledRectangle(57, 181, 96, 220, selectedColor2, selectedColor2, SMALL, PATTERN2, PATTERN2);
             showMouse(x, y);
         }
 
         //Left Click in Palette
-        if(((x > 23 && x < 41) || (x > 57 && x < 75)) && b==1){
+        if(((x > 23 && x < 41) || (x > 57 && x < 75)) && (y > 238 && y < 589) && b==1){
             hideMouse(x, y);
             selectedColor1 = getSelectedColor1(x - 1, y - 1);
+            color1 = COLOR;
             showMouse(x, y);
         }
         
         //Right Click in Palette
-        if(((x > 23 && x < 41) || (x > 57 && x < 75)) && b==2){
+        if(((x > 23 && x < 41) || (x > 57 && x < 75)) && (y > 238 && y < 589) && b==2){
             hideMouse(x, y);
             selectedColor2 = getSelectedColor2(x - 1, y - 1);
+            color2 = COLOR;
             showMouse(x, y);
         }
 
@@ -286,7 +308,7 @@ void main ()
                     tempy = y;
                     saveUndo();
                     while(b==1 && (x > 100 && x < 800) && (y > 100 && y < 600)){
-                        drawLine(x, y, tempx, tempy, selectedColor1, thickness);
+                        drawLine(x, y, tempx, tempy, selectedColor1, thickness, color1);
                         tempx = x; 
                         tempy = y;
                         getMouse(&x, &y, &b);
@@ -306,7 +328,7 @@ void main ()
                     hideMouse(x, y);
                     saveUndo();
                     if((x > 100 && x < 800) && (y > 100 && y < 600))
-                        drawLine(x1, y1, x, y, selectedColor1, thickness);
+                        drawLine(x1, y1, x, y, selectedColor1, thickness, color1);
                     showMouse(x, y);
                 break;
 
@@ -319,7 +341,7 @@ void main ()
                     hideMouse(x, y);
                     saveUndo();
                     if((x > 100 && x < 800) && (y > 100 && y < 600))
-                        drawRectangle(x1, y1 ,x, y, selectedColor1, thickness);
+                        drawRectangle(x1, y1 ,x, y, selectedColor1, thickness, color1);
                     showMouse(x, y);
                 break;
 
@@ -332,7 +354,7 @@ void main ()
                     hideMouse(x, y);
                     saveUndo();
                     if((x > 100 && x < 800) && (y > 100 && y < 600))
-                        drawFilledRectangle(x1, y1 ,x, y, selectedColor1, selectedColor2, thickness);
+                        drawFilledRectangle(x1, y1 ,x, y, selectedColor1, selectedColor2, thickness, color1, color2);
                     showMouse(x, y);
                 break;
 
@@ -342,7 +364,7 @@ void main ()
                     tempy = y;
                     saveUndo();
                     while(b==1 && (x > 100 && x < 800) && (y > 100 && y < 600)){
-                        drawLine(x, y, tempx, tempy, selectedColor2, thickness);
+                        drawLine(x, y, tempx, tempy, selectedColor2, thickness, color2);
                         tempx = x; 
                         tempy = y;
                         getMouse(&x,&y,&b);
@@ -355,7 +377,7 @@ void main ()
                 case BUCKET:
                     hideMouse(x, y);
                     saveUndo();
-                    bucketFill(x, y, selectedColor1, 0);
+                    bucketFill(x, y, selectedColor1, color1);
                     showMouse(x, y);
                 break;
 
@@ -378,7 +400,7 @@ void main ()
                 case EYEDROPPER:
                     if(b==1 && (x > 100 && x < 800) && (y > 100 && y < 600)){
                         selectedColor1 = getPixel(x - 1, y - 1);
-                        drawFilledRectangle(5, 181, 44, 220, selectedColor1, selectedColor1, 1);
+                        drawFilledRectangle(5, 181, 44, 220, selectedColor1, selectedColor1, 1, COLOR, COLOR);
                     }
                 break;
 
@@ -402,7 +424,7 @@ void main ()
                             if(b==1 && (x > 100 && x < 800) && (y > 100 && y < 600)){
                                 hideMouse(x, y);
                                 delay(300);
-                                drawLine(x1, y1, x, y, selectedColor1, thickness);
+                                drawLine(x1, y1, x, y, selectedColor1, thickness, color1);
                                 showMouse(x, y);
                                 cont++;
                             }
@@ -410,7 +432,7 @@ void main ()
                             if(b==2 && (x > 100 && x < 800) && (y > 100 && y < 600)){
                                 hideMouse(x, y);
                                 delay(300);
-                                drawLine(i, j, x1, y1, selectedColor1, thickness);
+                                drawLine(i, j, x1, y1, selectedColor1, thickness, color1);
                                 showMouse(x, y);
                                 cont++;
                             }
@@ -446,7 +468,7 @@ void main ()
                                 a[cont][0] = x; 
                                 a[cont][1] = y;
                                 delay(300);
-                                drawLine(x1, y1, x, y, selectedColor1, thickness);
+                                drawLine(x1, y1, x, y, selectedColor1, thickness, color1);
                                 showMouse(x, y);
                                 cont++;
                             }
@@ -456,7 +478,7 @@ void main ()
                                 a[cont][0] = i; 
                                 a[cont][1] = j;
                                 delay(300);
-                                drawLine(i, j, x1, y1, selectedColor1, thickness);
+                                drawLine(i, j, x1, y1, selectedColor1, thickness, color1);
                                 showMouse(x, y);
                                 cont++;
                             }
@@ -465,7 +487,7 @@ void main ()
                         y1 = y;
                         
                     }
-                    scanline(a, cont, selectedColor1, selectedColor2, thickness);
+                    scanline(a, cont, selectedColor1, selectedColor2, thickness, color1, color2);
                 break;
 
                 case TEXT:
@@ -486,8 +508,10 @@ void main ()
                     saveUndo();
                     rx = abs(x - x1) / 2;
                     ry = abs(y - y1) / 2;
+                    xc = MIN(x1, x) + rx;
+                    yc = MIN(y1, y) + ry;
                     if((x > 100 && x < 800) && (y > 100 && y < 600))
-                        ellipse(x1, y1 ,x, y, selectedColor1, thickness);
+                        ellipse(x1, y1 ,x, y, selectedColor1, thickness, color1);
                     showMouse(x, y);
                 break;
 
@@ -504,7 +528,7 @@ void main ()
                     xc = MIN(x1, x) + rx;
                     yc = MIN(y1, y) + ry;
                     if((x > 100 && x < 800) && (y > 100 && y < 600))
-                        filledElipse(xc, yc, rx, ry, selectedColor1, selectedColor2, thickness);
+                        filledElipse(xc, yc, rx, ry, selectedColor1, selectedColor2, thickness, color1, color2);
                     showMouse(x, y);
                 break;
             }
@@ -517,14 +541,14 @@ void main ()
                 case BUCKET:
                     hideMouse(x, y);
                     saveUndo();
-                    bucketFill(x, y, selectedColor2, 0);
+                    bucketFill(x, y, selectedColor2, color2);
                     showMouse(x, y);
                 break;
 
                 case EYEDROPPER:
-                    if(b==1 && (x > 100 && x < 800) && (y > 100 && y < 600)){
+                    if(b==2 && (x > 100 && x < 800) && (y > 100 && y < 600)){
                         selectedColor2 = getPixel(x - 1, y - 1);
-                        drawFilledRectangle(57, 181, 96, 220, selectedColor2, selectedColor2, 1);
+                        drawFilledRectangle(57, 181, 96, 220, selectedColor2, selectedColor2, 1, COLOR, COLOR);
                     }
                 break;
             }

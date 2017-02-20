@@ -1,13 +1,13 @@
 #define sgn(x) ((x < 0) ? -1 : ( (x > 0) ? 1 : 0))
 
-void drawLine(int x1, int y1, int x2, int y2, char color, int thickness);
-void drawRectangle(int x1, int y1, int x2, int y2, char color,int thickness);
-void drawFilledRectangle(int x1, int y1, int x2, int y2, char color1, char color2, int thickness);
+void drawLine(int x1, int y1, int x2, int y2, char color, int thickness, int pattern);
+void drawRectangle(int x1, int y1, int x2, int y2, char color,int thickness, int pattern);
+void drawFilledRectangle(int x1, int y1, int x2, int y2, char color1, char color2, int thickness, int patternLine, int patternFill);
 void spray(int x, int y, char color);
 void bucketFill(int x, int y, char fillColor, int pattern);
-void scanline(int a[20][2], int n, char color1, char color2, int thickness);
-void filledElipse(int xc, int yc, int rx, int ry, char color1, char color2, int thickness);
-void ellipse(int xc, int yc, int rx, int ry, char color, int thickness);
+void scanline(int a[20][2], int n, char color1, char color2, int thickness, int patternLine, int patternFill);
+void filledElipse(int xc, int yc, int rx, int ry, char color1, char color2, int thickness, int patternLine, int patternFill);
+void ellipse(int xc, int yc, int rx, int ry, char color, int thickness, int pattern);
 
 typedef struct linkedList{
   int x;
@@ -17,7 +17,7 @@ typedef struct linkedList{
 
 int * colores;
 
-void drawLine(int x1, int y1, int x2, int y2, char color, int thickness){
+void drawLine(int x1, int y1, int x2, int y2, char color, int thickness, int pattern){
 int i, dx, dy, sdx, sdy, x, y, px, py;
 	dx = x2 - x1;
 	dy = y2 - y1;
@@ -47,7 +47,7 @@ int i, dx, dy, sdx, sdy, x, y, px, py;
 				py += sdy;
 			}
 			px+=sdx;
-			putGrossPixel(px, py, color, thickness);
+			putThicknessPixel(px, py, color, thickness, pattern);
 		}
 	}else{
 		for(i=0; i<dy; i++){
@@ -57,19 +57,19 @@ int i, dx, dy, sdx, sdy, x, y, px, py;
 				px += sdx;
 			}
 			py+=sdy;
-			putGrossPixel(px, py, color, thickness);
+			putThicknessPixel(px, py, color, thickness, pattern);
 		}
 	}
 }
 
-void drawRectangle(int x1, int y1, int x2, int y2, char color,int thickness){
-	drawLine(x1, y1, x2, y1, color, thickness);
-	drawLine(x1, y1, x1, y2, color, thickness);
-	drawLine(x2, y1, x2, y2, color, thickness);
-	drawLine(x1, y2, x2, y2, color, thickness);
+void drawRectangle(int x1, int y1, int x2, int y2, char color,int thickness, int pattern){
+	drawLine(x1, y1, x2, y1, color, thickness, pattern);
+	drawLine(x1, y1, x1, y2, color, thickness, pattern);
+	drawLine(x2, y1, x2, y2, color, thickness, pattern);
+	drawLine(x1, y2, x2, y2, color, thickness, pattern);
 }
 
-void drawFilledRectangle(int x1, int y1, int x2, int y2, char color1, char color2, int thickness){
+void drawFilledRectangle(int x1, int y1, int x2, int y2, char color1, char color2, int thickness, int patternLine, int patternFill){
 	int y, temp;
 
 	//Arregla los valores de y1 y y2 para que sean congruentes.
@@ -81,11 +81,11 @@ void drawFilledRectangle(int x1, int y1, int x2, int y2, char color1, char color
 
 	//Se dibuja el relleno del rectangulo.
 	for(y = y1; y <= y2; y++){
-		drawLine(x1, y, x2, y, color2 ,1);
+		drawLine(x1, y, x2, y, color2 , 1, patternFill);
 	}
 
 	//Se dibuja el contorno.
-	drawRectangle(x1, y1, x2, y2, color1, thickness);
+	drawRectangle(x1, y1, x2, y2, color1, thickness, patternLine);
 }
 
 void spray(int x, int y, char color){
@@ -136,11 +136,9 @@ void bucketFill(int x, int y, char fillColor, int pattern){
 	while(start!=NULL){
 
 		if(pattern==1){
-			fillColor = getPixel(100 + x%32, 550 + y%32);
+			fillColor = getPixel(5 + x%40, 129 + y%40);
 		}else if(pattern == 2){
-			fillColor = getPixel(100 + x%32, 510 + y%32);
-		}else if(pattern==3){
-			fillColor = colores[x%4];
+			fillColor = getPixel(57 + x%40, 129 + y%40);
 		}
 
 		putPixel(x,y,fillColor);
@@ -148,11 +146,9 @@ void bucketFill(int x, int y, char fillColor, int pattern){
 		tempx = x-1;
 		if(getPixel(tempx,y) == oldColor && ((tempx)>100 && (tempx)<800 && y>100 && y<600)) {
 			if(pattern==1){
-				fillColor = getPixel(100 + tempx%32, 550 + y%32);
+				fillColor = getPixel(5 + tempx%40, 129 + y%40);
 			}else if(pattern == 2){
-				fillColor = getPixel(100 + tempx%32, 510 + y%32);
-			}else if(pattern==3){
-				fillColor = colores[tempx%4];
+				fillColor = getPixel(57 + tempx%40, 129 + y%40);
 			}
 			putPixel(tempx,y,fillColor);
 			push(tempx, y, &finish);
@@ -161,11 +157,9 @@ void bucketFill(int x, int y, char fillColor, int pattern){
 		tempy = y+1;
 		if(getPixel(x,tempy) == oldColor && (x>100 && x<800 && (tempy)>100 && (tempy)<600)){
 			if(pattern==1){
-				fillColor = getPixel(100 + x%32, 550 + tempy%32);
+				fillColor = getPixel(5 + x%40, 129 + tempy%40);
 			}else if(pattern == 2){
-				fillColor = getPixel(100 + x%32, 510 + tempy%32);
-			}else if(pattern==3){
-				fillColor = colores[x%4];
+				fillColor = getPixel(57 + x%40, 129 + tempy%40);
 			}
 
 			putPixel(x,tempy,fillColor);
@@ -175,11 +169,9 @@ void bucketFill(int x, int y, char fillColor, int pattern){
 		tempx = x+1;
 		if(getPixel(tempx,y) == oldColor && ((tempx)>100 && (tempx)<800 && y>100 && y<600)){
 			if(pattern==1){
-				fillColor = getPixel(100 + tempx%32, 550 + y%32);
+				fillColor = getPixel(5 + tempx%40, 129 + y%40);
 			}else if(pattern == 2){
-				fillColor = getPixel(100 + tempx%32, 510 + y%32);
-			}else if(pattern==3){
-				fillColor = colores[tempx%4];
+				fillColor = getPixel(57 + tempx%40, 129 + y%40);
 			}
 
 			putPixel(tempx,y,fillColor);
@@ -189,11 +181,9 @@ void bucketFill(int x, int y, char fillColor, int pattern){
 		tempy = y-1;
 		if(getPixel(x,tempy) == oldColor && (x>100 && x<800 && (tempy)>100 && (tempy)<600)){
 			if(pattern==1){
-				fillColor = getPixel(100 + x%32, 550 + tempy%32);
+				fillColor = getPixel(5 + x%40, 129 + tempy%40);
 			}else if(pattern == 2){
-				fillColor = getPixel(100 + x%32, 510 + tempy%32);
-			}else if(pattern==3){
-				fillColor = colores[x%4];
+				fillColor = getPixel(57 + x%40, 129 + tempy%40);
 			}
 
 			putPixel(x,tempy,fillColor);
@@ -209,7 +199,7 @@ void bucketFill(int x, int y, char fillColor, int pattern){
 	free(start);
 }
 
-void scanline(int a[20][2], int n, char color1, char color2, int thickness){
+void scanline(int a[20][2], int n, char color1, char color2, int thickness, int patternLine, int patternFill){
 	int i,j,k,gd,gm,dy,dx;
 	int x,y,temp;
 	int xi[20];
@@ -257,17 +247,17 @@ void scanline(int a[20][2], int n, char color1, char color2, int thickness){
 
 		for(i=0;i<k;i+=2)
 		{
-			drawLine(xi[i], y, xi[i+1]+1, y, color2, 1);
+			drawLine(xi[i], y, xi[i+1]+1, y, color2, 1, patternFill);
 		}
 	}
 
 	for(i=0; i<n-1; i++) 
 	{
-		drawLine(a[i][0], a[i][1], a[i+1][0], a[i+1][1], color1, thickness);
+		drawLine(a[i][0], a[i][1], a[i+1][0], a[i+1][1], color1, thickness, patternLine);
 	}
 }
 
-void ellipse(int xc, int yc, int rx, int ry, char color, int thickness){
+void ellipse(int xc, int yc, int rx, int ry, char color, int thickness, int pattern){
   int x,y;
   float p;
   p=(ry*ry)-(rx*rx*ry)+((rx*rx)/4.0);
@@ -285,10 +275,10 @@ void ellipse(int xc, int yc, int rx, int ry, char color, int thickness){
       y--;
       p = p+2.0*ry*ry*x-2.0*rx*rx*y-(float)ry*ry;
     }
-    putGrossPixel(xc+x,yc+y,color,thickness);
-    putGrossPixel(xc+x,yc-y,color,thickness);
-    putGrossPixel(xc-x,yc+y,color,thickness);
-    putGrossPixel(xc-x,yc-y,color,thickness);
+    putThicknessPixel(xc+x, yc+y, color, thickness, pattern);
+    putThicknessPixel(xc+x, yc-y, color, thickness, pattern);
+    putThicknessPixel(xc-x, yc+y, color, thickness, pattern);
+    putThicknessPixel(xc-x, yc-y, color, thickness, pattern);
    }
 
   //Region 2
@@ -303,14 +293,14 @@ void ellipse(int xc, int yc, int rx, int ry, char color, int thickness){
       y--;
       p = p-2.0*rx*rx*y+(float)rx*rx;
     }
-    putGrossPixel(xc+x,yc+y,color,thickness);
-    putGrossPixel(xc+x,yc-y,color,thickness);
-    putGrossPixel(xc-x,yc+y,color,thickness);
-    putGrossPixel(xc-x,yc-y,color,thickness);
+    putThicknessPixel(xc+x, yc+y, color, thickness, pattern);
+    putThicknessPixel(xc+x, yc-y, color, thickness, pattern);
+    putThicknessPixel(xc-x, yc+y, color, thickness, pattern);
+    putThicknessPixel(xc-x, yc-y, color, thickness, pattern);
   }
 }
 
-void filledElipse(int xc, int yc, int rx, int ry, char color1, char color2, int thickness){
+void filledElipse(int xc, int yc, int rx, int ry, char color1, char color2, int thickness, int patternLine, int patternFill){
   int x,y;
   double dx,dy;
   for( y=-ry; y<=ry; y++) {
@@ -318,8 +308,8 @@ void filledElipse(int xc, int yc, int rx, int ry, char color1, char color2, int 
         dx = (double)x / (double)rx;
         dy = (double)y / (double)ry;
         if(dx*dx+dy*dy <= 1)
-            putGrossPixel(xc+x,yc+y,color2,1);
+            putThicknessPixel(xc+x, yc+y, color2, 1, patternFill);
     }
 }
-  ellipse(xc,yc,rx,ry,color1,thickness);
+  ellipse(xc, yc, rx, ry, color1, thickness, patternLine);
 }

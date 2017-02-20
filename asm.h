@@ -6,7 +6,7 @@ int setVideoMode(int mode, long width, long height);
 void unsetVideoMode();
 void setBank(char bank);
 void putPixel(int x, int y, char color);
-void putPixelGrosor(int x, int y, char color, int size);
+void putThicknessPixel(int x, int y, char color, int thickness, int pattern);
 char getPixel(int x, int y);
 
 char currentBank;
@@ -33,67 +33,89 @@ int setVideoMode(int mode, long width, long height)
 
 void unsetVideoMode()
 {
-  asm{
-    MOV AX, 0003H
-    XOR BX, BX
-    INT 10H
-  }
+    asm{
+        MOV AX, 0003H
+        XOR BX, BX
+        INT 10H
+    }
 }
 
 void setBank(char banco)
 {
-  asm{
-    MOV AL, [banco]
-    CMP[currentBank], AL
-    JE noSwitch
-    MOV [currentBank], AL
-    MOV AX, 4F05H
-    XOR BX, BX 
-    XOR DX, DX
-    MOV DL, [banco]
-    INT 10H
-  }
-  noSwitch:;
+    asm{
+        MOV AL, [banco]
+        CMP[currentBank], AL
+        JE noSwitch
+        MOV [currentBank], AL
+        MOV AX, 4F05H
+        XOR BX, BX 
+        XOR DX, DX
+        MOV DL, [banco]
+        INT 10H
+    }
+    noSwitch:;
 }
 
 void putPixel(int x,int y, char color)
 {
-  long address;
-  int off;  
-  char bank;
+    long address;
+    int off;  
+    char bank;
 
-  if(x>resolutionWidth || x<0 || y>resolutionHeight || y<0)
-    return;
+    if(x>resolutionWidth || x<0 || y>resolutionHeight || y<0)
+        return;
 
-  address = (resolutionWidth*y)+x;
+    address = (resolutionWidth*y)+x;
 
-  // Offset = address - (bank * 0ffffh) = address - (bank * 2^16)
-  // Left Shift (<<) = A<<B = A * 2^B
-  off = address-(bank<<16);
-  // Bank = address / 0ffffh = address / 2^16
-  // Right Shift (>>) = A>>B = A / 2^B
-  bank = address>>16;
+    // Offset = address - (bank * 0ffffh) = address - (bank * 2^16)
+    // Left Shift (<<) = A<<B = A * 2^B
+    off = address-(bank<<16);
+    // Bank = address / 0ffffh = address / 2^16
+    // Right Shift (>>) = A>>B = A / 2^B
+    bank = address>>16;
 
-  if(bank != currentBank){
-    setBank(bank);
-    currentBank = bank;
-  }
+    if(bank != currentBank){
+        setBank(bank);
+        currentBank = bank;
+    }
 
-  asm{
-    MOV AX, 0A000H
-    MOV ES, AX
-    MOV DI, [off]
-    MOV AL, [color]
-    MOV ES:[DI], AL
-  }
+    asm{
+        MOV AX, 0A000H
+        MOV ES, AX
+        MOV DI, [off]
+        MOV AL, [color]
+        MOV ES:[DI], AL
+    }
 }
 
-void putGrossPixel(int x, int y, char color, int size)
+void putThicknessPixel(int x, int y, char color, int thickness, int pattern)
 {
-  int i,j;
-  for(i=0;i<size;i++)
-    for(j=0;j<size;j++)
-      putPixel(x+i,y+j,color);
+    int i,j;
+
+    if (pattern == 0)
+    {
+        for(i=0; i<thickness; i++)
+            for(j=0; j<thickness; j++)
+                putPixel(x+i, y+j, color);
+    }
+    
+    if(pattern == 1)
+    {
+        color = getPixel(5 + x%40, 129 + y%40);
+
+        for(i=0; i<thickness; i++)
+            for(j=0; j<thickness; j++)
+                putPixel(x+i, y+j, color);
+    }
+
+    if(pattern == 2)
+    {
+        color = getPixel(57 + x%40, 129 + y%40);
+
+        for(i=0; i<thickness; i++)
+            for(j=0; j<thickness; j++)
+                putPixel(x+i, y+j, color);
+    }
 }
 
 char getPixel(int x, int y)
