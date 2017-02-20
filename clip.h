@@ -1,4 +1,3 @@
-/* Estructuras */
 typedef struct ClipLine{
     int x0;
     int y0;

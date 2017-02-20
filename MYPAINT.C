@@ -25,7 +25,8 @@ void main ()
     char selectedColor1, selectedColor2;
     int thickness = 1;
     int a[20][2];
-    
+    BITMAP bmp;
+
     FILE *fontFile;
     unsigned char font[58][16*16];
     unsigned char backspace[16][16];
@@ -67,18 +68,25 @@ void main ()
             hideMouse(x, y);
             canvas();
             toolBar();
+            showSelectedThickness(thickness, 0);
+            showSelectedAction(selectedAction, 0);
             showMouse(x, y);
         }
 
         //Click Save
         if((x > 10 && x < 42) && (y > 56 && y < 88) && b==1){
             hideMouse(x, y);
+            saveImage(100, 100, 800, 600, "MyPaint/Images/Paint.bmp");
             showMouse(x, y);
         }
 
         //Click Open
         if((x > 42 && x < 75) && (y > 12 && y < 88) && b==1){
             hideMouse(x, y);
+            loadImage(100, 100, "MyPaint/Images/Paint.bmp", &bmp);
+            topToolBar();
+            showSelectedThickness(thickness, 0);
+            showSelectedAction(selectedAction, 0);
             showMouse(x, y);
         }
 

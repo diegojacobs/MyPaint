@@ -32,14 +32,25 @@ char getSelectedColor1(int x, int y);
 char getSelectedColor2(int x, int y);
 void showSelectedThickness(int new, int old);
 
+
 void toolBar(){
     BITMAP bmp;
     loadImage(0, 0, "MyPaint/Images/toolbar.bmp", &bmp);
 }
 
+void topToolBar(){
+    BITMAP bmp;
+    loadImage(0, 0, "MyPaint/Images/topbar.bmp", &bmp);
+}
+
+void leftToolBar(){
+    BITMAP bmp;
+    loadImage(0, 0, "MyPaint/Images/leftbar.bmp", &bmp);
+}
+
 void canvas(){
     BITMAP bmp;
-    loadImage(0, 100, "MyPaint/Images/canvas.bmp", &bmp);
+    loadImage(100, 100, "MyPaint/Images/canvas.bmp", &bmp);
 }
 
 char getSelectedColor1(int x, int y){
