@@ -1,5 +1,6 @@
 #define sgn(x) ((x < 0) ? -1 : ( (x > 0) ? 1 : 0))
 
+void drawTempLine(int p1x, int p1y, int p2x, int p2y, int color);
 void drawLine(int x1, int y1, int x2, int y2, char color, int thickness, int pattern);
 void drawRectangle(int x1, int y1, int x2, int y2, char color,int thickness, int pattern);
 void drawFilledRectangle(int x1, int y1, int x2, int y2, char color1, char color2, int thickness, int patternLine, int patternFill);

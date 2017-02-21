@@ -7,7 +7,7 @@ typedef struct ClipLine{
 typedef unsigned int outCode;
 
 enum {  
-    TOP = 0x1,      //1000
+    TOP = 0x1,      //0001
     BOTTOM = 0x2,   //0010
     RIGHT = 0x4,    //0100
     LEFT = 0x8      //1000
