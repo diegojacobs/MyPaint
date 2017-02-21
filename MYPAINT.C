@@ -11,6 +11,7 @@
 #include "text.h"
 #include "graph.h"
 #include "bar.h"
+#include "ccp.h"
 
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
@@ -78,14 +79,14 @@ void main ()
         //Click Save
         if((x > 10 && x < 42) && (y > 56 && y < 88) && b==1){
             hideMouse(x, y);
-            saveImage(100, 100, 800, 600, "MyPaint/Buffer/Paint.bmp");
+            saveImage(100, 100, 700, 500, "MyPaint/Paint.bmp");
             showMouse(x, y);
         }
 
         //Click Open
         if((x > 42 && x < 75) && (y > 12 && y < 88) && b==1){
             hideMouse(x, y);
-            loadImage(100, 100, "MyPaint/Buffer/Paint.bmp", &bmp);
+            loadImage(100, 100, "MyPaint/Paint.bmp", &bmp);
             topToolBar();
             showSelectedThickness(thickness, 0);
             showSelectedAction(selectedAction, 0);
@@ -297,6 +298,23 @@ void main ()
             selectedColor2 = getSelectedColor2(x - 1, y - 1);
             color2 = COLOR;
             showMouse(x, y);
+        }
+
+        //Click in Help
+        if((x > 752 && x < 776) && (y > 0 && y < 20) && b==1){
+            hideMouse(x,y);
+            copyFile(0, 0, 800, 600);
+
+            loadImage(0, 0, "MyPaint/Images/help.bmp",&bmp);
+            showMouse(x,y);
+            b=0;
+            while(b!=1){
+                refreshMouse(&x, &y, &b, &tempx, &tempy);
+            }
+
+            hideMouse(x,y);
+            pasteFile(0, 0);
+            showMouse(x,y);
         }
 
         //Left click in canvas
@@ -530,6 +548,36 @@ void main ()
                     if((x > 100 && x < 800) && (y > 100 && y < 600))
                         filledElipse(xc, yc, rx, ry, selectedColor1, selectedColor2, thickness, color1, color2);
                     showMouse(x, y);
+                break;
+
+                case COPY:
+                    x1 = x;
+                    y1 = y;
+                    while(b==1){
+                        refreshMouse(&x, &y, &b, &tempx, &tempy);
+                    }
+                    hideMouse(x,y);
+                    copyFile(x1, y1, x, y);
+                    showMouse(x,y);
+                break;
+
+                case CUT:
+                    x1 = x;
+                    y1 = y;
+                    while(b==1){
+                        refreshMouse(&x, &y, &b, &tempx, &tempy);
+                    }
+                    hideMouse(x,y);
+                    saveUndo();
+                    cutFile(x1, y1, x, y, selectedColor2, color2);
+                    showMouse(x,y);
+                break;
+
+                case PASTE:
+                    hideMouse(x,y);
+                    saveUndo();
+                    pasteFile(x, y);
+                    showMouse(x,y);
                 break;
             }
             

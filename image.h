@@ -1,8 +1,7 @@
 #ifndef __DOS_H
   #include <dos.h>
-#endif                          /* si no esta  incluida dos.h, incluirla */
-        
-/* Estructuras */
+#endif
+
 typedef unsigned char  byte;
 typedef unsigned short word;
 
@@ -13,11 +12,8 @@ typedef struct tagBITMAP{
   byte *data;
 }BITMAP;
 
-/* Funciones */
 void fskip(FILE *fp, int num_bytes);
-void drawImage(int x, int y, BITMAP *bitmap);
 void setPalette(char far *palette);
-void getImage(int x, int y, int width, int height, char *bitmap);
 void loadImage(int x, int y, char *file, BITMAP *b);
 void saveImage(int x, int y, int width, int height, char file[]);
 
@@ -54,15 +50,9 @@ void loadImage(int x, int y,char *file, BITMAP *b){
     if(colorNum==0){
       colorNum = 256;
     }
-    /*
-    //Trata de alocar memoria
-     if ((b->data = (byte *) malloc((word)(b->width*b->height))) == NULL){
-      fclose(fp);
-      exit(1);
-    }
-    */
+
     //Lee la información de la paleta.
-    for(index=0;index<colorNum;index++){
+    for(index=0; index<colorNum; index++){
       b->palette[(int)(index*3+2)] = fgetc(fp) >> 2;
       b->palette[(int)(index*3+1)] = fgetc(fp) >> 2;
       b->palette[(int)(index*3+0)] = fgetc(fp) >> 2;
@@ -71,13 +61,12 @@ void loadImage(int x, int y,char *file, BITMAP *b){
 
   setPalette(b->palette);
   //Lee el bitmap
-  for(j=(b->height + y);j>=0;j--){
+  for(j=(b->height + y); j>=y ; j--){
     for(i=0; i<(b->width); i++){
       putPixel(i+x, j, fgetc(fp));
 
       if(i+x==300 && j ==300)
         printf("C: %d\n", getPixel(i+x,y));
-      //b->data[(word)index+x]=(byte)fgetc(fp);
     }
   }
   fclose(fp);
@@ -113,13 +102,7 @@ void loadPalette(char *file, BITMAP *b){
     if(colorNum==0){
       colorNum = 256;
     }
-    /*
-    //Trata de alocar memoria
-     if ((b->data = (byte *) malloc((word)(b->width*b->height))) == NULL){
-      fclose(fp);
-      exit(1);
-    }
-    */
+
     //Lee la información de la paleta.
     for(index=0;index<colorNum;index++){
       b->palette[(int)(index*3+2)] = fgetc(fp) >> 2;
@@ -164,32 +147,6 @@ void getPalette ( char far *palette){
   mov cx, 256
   int 0x10
        }
-}
-//---------------------------------------------------------
-// Dibuja en pantalla un bitmap específico.
-//---------------------------------------------------------
-void drawImage(int x, int y, BITMAP *bitmap){
-  int vx, vy;
-
-  for(vy=0; vy<bitmap->height; vy++){
-    for(vx=0; vx<bitmap->width; vx++){
-      //if(bitmap->data[(vy*bitmap->width)+vx]=!15){
-        putPixel(x+vx, y+vy, bitmap->data[(vy*bitmap->width)+vx]);
-      //}
-    }
-  }
-}
-
-//---------------------------------------------------------
-// Regresa en un arreglo una imagen.
-//---------------------------------------------------------
-void getImage(int x, int y, int width, int height, char *bitmap){
-  int vx, vy;
-  for(vy=0; vy<height; vy++){
-    for(vx=0; vx<width; vx++){
-      bitmap[(vy*width)+vx] = getPixel(x+vx, y+vy);
-    }
-  }
 }
 
 //---------------------------------------------------------
