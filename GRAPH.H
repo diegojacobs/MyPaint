@@ -11,15 +11,15 @@ void filledElipse(int xc, int yc, int rx, int ry, char color1, char color2, int 
 void ellipse(int xc, int yc, int rx, int ry, char color, int thickness, int pattern);
 
 typedef struct linkedList{
-  int x;
-  int y;
-  struct Node* next;
+	int x;
+	int y;
+	struct Node* next;
 }Node;
 
 int * colores;
 
 void drawLine(int x1, int y1, int x2, int y2, char color, int thickness, int pattern){
-int i, dx, dy, sdx, sdy, x, y, px, py;
+	int i, dx, dy, sdx, sdy, x, y, px, py;
 	dx = x2 - x1;
 	dy = y2 - y1;
 
@@ -90,16 +90,18 @@ void drawFilledRectangle(int x1, int y1, int x2, int y2, char color1, char color
 }
 
 void spray(int x, int y, char color){
-  int i, randx, randy;
-  time_t t;
-  randx = 0;  
-  randy = 0;      
-  for(i = 0; i < 5000; i++){
-    srand((unsigned) time(&t)+randx);
-    randx = rand() % 20;
-    randy = rand() % 20;
-    putPixel(x-randx, y-randy, color);
-  }
+	int i, randx, randy;
+	time_t t;
+	randx = 0;  
+	randy = 0;   
+	   
+	for(i = 0; i < 5000; i++)
+	{
+		srand((unsigned) time(&t)+randx);
+		randx = rand() % 20;
+		randy = rand() % 20;
+		putPixel(x-randx, y-randy, color);
+	}
 }
 
 void push(int x, int y, Node ** finish){
@@ -143,6 +145,7 @@ void bucketFill(int x, int y, char fillColor, int pattern){
 		}
 
 		putPixel(x,y,fillColor);
+
 		//Izquierda
 		tempx = x-1;
 		if(getPixel(tempx,y) == oldColor && ((tempx)>100 && (tempx)<800 && y>100 && y<600)) {
@@ -154,6 +157,7 @@ void bucketFill(int x, int y, char fillColor, int pattern){
 			putPixel(tempx,y,fillColor);
 			push(tempx, y, &finish);
 		}
+
 		//Arriba
 		tempy = y+1;
 		if(getPixel(x,tempy) == oldColor && (x>100 && x<800 && (tempy)>100 && (tempy)<600)){
@@ -166,6 +170,7 @@ void bucketFill(int x, int y, char fillColor, int pattern){
 			putPixel(x,tempy,fillColor);
 			push(x, tempy, &finish);
 		}
+
 		//Derecha
 		tempx = x+1;
 		if(getPixel(tempx,y) == oldColor && ((tempx)>100 && (tempx)<800 && y>100 && y<600)){
@@ -178,6 +183,7 @@ void bucketFill(int x, int y, char fillColor, int pattern){
 			putPixel(tempx,y,fillColor);
 			push(tempx,y, &finish);
 		}
+
 		//Abajo
 		tempy = y-1;
 		if(getPixel(x,tempy) == oldColor && (x>100 && x<800 && (tempy)>100 && (tempy)<600)){
@@ -190,6 +196,7 @@ void bucketFill(int x, int y, char fillColor, int pattern){
 			putPixel(x,tempy,fillColor);
 			push(x,tempy, &finish);
 		}
+
 		//Se mueve al siguiente elemento de la lista.
 		tmp=start;
 		start=start->next;
@@ -216,7 +223,7 @@ void scanline(int a[20][2], int n, char color1, char color2, int thickness, int 
 		if(dx==0) 
 			slope[i]=0.0;
 
-		if((dy!=0)&&(dx!=0)) /*- calculate inverse slope -*/ 
+		if((dy!=0)&&(dx!=0))
 		{
 			slope[i]=(float) dx/dy;
 		}
@@ -235,7 +242,7 @@ void scanline(int a[20][2], int n, char color1, char color2, int thickness, int 
 			}
 		}
 
-		for(j=0;j<k-1;j++) /*- Arrange x-intersections in order -*/
+		for(j=0;j<k-1;j++)
 			for(i=0;i<k-1;i++)
 			{
 				if(xi[i]>xi[i+1])
@@ -259,58 +266,65 @@ void scanline(int a[20][2], int n, char color1, char color2, int thickness, int 
 }
 
 void ellipse(int xc, int yc, int rx, int ry, char color, int thickness, int pattern){
-  int x,y;
-  float p;
-  p=(ry*ry)-(rx*rx*ry)+((rx*rx)/4.0);
-  x=0;
-  y=ry;
-  while(2.0*ry*ry*x <= 2.0*rx*rx*y){
-    if(p < 0)
-    {
-      x++;
-      p = p+2.0*ry*ry*x+(float)ry*ry;
-    }
-    else
-    {
-      x++;
-      y--;
-      p = p+2.0*ry*ry*x-2.0*rx*rx*y-(float)ry*ry;
-    }
-    putThicknessPixel(xc+x, yc+y, color, thickness, pattern);
-    putThicknessPixel(xc+x, yc-y, color, thickness, pattern);
-    putThicknessPixel(xc-x, yc+y, color, thickness, pattern);
-    putThicknessPixel(xc-x, yc-y, color, thickness, pattern);
-   }
+	int x,y;
+	float p;
+	p=(ry*ry)-(rx*rx*ry)+((rx*rx)/4.0);
+	x=0;
+	y=ry;
 
-  //Region 2
-  p=((float)x+0.5)*((float)x+0.5)*ry*ry+((float)y-1.0)*((float)y-1.0)*rx*rx-(float)rx*rx*ry*ry;
-  while(y > 0){
-    if(p <= 0){
-      x++;
-      y--;
-      p = p+2.0*ry*ry*x-2.0*rx*rx*y+(float)rx*rx;
-    }
-    else{
-      y--;
-      p = p-2.0*rx*rx*y+(float)rx*rx;
-    }
-    putThicknessPixel(xc+x, yc+y, color, thickness, pattern);
-    putThicknessPixel(xc+x, yc-y, color, thickness, pattern);
-    putThicknessPixel(xc-x, yc+y, color, thickness, pattern);
-    putThicknessPixel(xc-x, yc-y, color, thickness, pattern);
-  }
+	while(2.0*ry*ry*x <= 2.0*rx*rx*y)
+	{
+		if(p < 0)
+		{
+			x++;
+			p = p+2.0*ry*ry*x+(float)ry*ry;
+		}
+		else
+		{
+			x++;
+			y--;
+			p = p+2.0*ry*ry*x-2.0*rx*rx*y-(float)ry*ry;
+		}
+		putThicknessPixel(xc+x, yc+y, color, thickness, pattern);
+		putThicknessPixel(xc+x, yc-y, color, thickness, pattern);
+		putThicknessPixel(xc-x, yc+y, color, thickness, pattern);
+		putThicknessPixel(xc-x, yc-y, color, thickness, pattern);
+	}
+
+	//Region 2
+	p=((float)x+0.5)*((float)x+0.5)*ry*ry+((float)y-1.0)*((float)y-1.0)*rx*rx-(float)rx*rx*ry*ry;
+	
+	while(y > 0)
+	{
+		if(p <= 0)
+		{
+			x++;
+			y--;
+			p = p+2.0*ry*ry*x-2.0*rx*rx*y+(float)rx*rx;
+		}
+		else
+		{
+			y--;
+			p = p-2.0*rx*rx*y+(float)rx*rx;
+		}
+		putThicknessPixel(xc+x, yc+y, color, thickness, pattern);
+		putThicknessPixel(xc+x, yc-y, color, thickness, pattern);
+		putThicknessPixel(xc-x, yc+y, color, thickness, pattern);
+		putThicknessPixel(xc-x, yc-y, color, thickness, pattern);
+	}
 }
 
 void filledElipse(int xc, int yc, int rx, int ry, char color1, char color2, int thickness, int patternLine, int patternFill){
-  int x,y;
-  double dx,dy;
-  for( y=-ry; y<=ry; y++) {
-    for( x=-rx; x<=rx; x++) {
-        dx = (double)x / (double)rx;
-        dy = (double)y / (double)ry;
-        if(dx*dx+dy*dy <= 1)
-            putThicknessPixel(xc+x, yc+y, color2, 1, patternFill);
-    }
-}
-  ellipse(xc, yc, rx, ry, color1, thickness, patternLine);
+	int x,y;
+	double dx,dy;
+	for( y=-ry; y<=ry; y++) {
+		for( x=-rx; x<=rx; x++) {
+		    dx = (double)x / (double)rx;
+		    dy = (double)y / (double)ry;
+		    if(dx*dx + dy*dy <= 1)
+		        putThicknessPixel(xc+x, yc+y, color2, 1, patternFill);
+		}
+	}
+
+	ellipse(xc, yc, rx, ry, color1, thickness, patternLine);
 }
